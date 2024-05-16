@@ -1,9 +1,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-import matplotlib.pyplot as plt
 import datetime
-import seaborn as sb
 
 st.set_page_config(page_title="My Sale Dashboard",page_icon=":bar_chart:",layout="wide")
 df=pd.read_csv("all_df.csv")
@@ -63,7 +61,6 @@ qty_chart=px.bar(
 b_col.plotly_chart(qty_chart,user_container_wide=True)
 
 
-city_total=df_select.groupby('City')['Total'].sum().sort_values()
 city_total_pie=px.pie(
     df_select,
     values='Total',
@@ -71,19 +68,34 @@ city_total_pie=px.pie(
     title='Total Sales By Month'
     )
 c_col.plotly_chart(city_total_pie,user_container_wide=True)
-st.title("Total order quantity of cities by dates")
+
+
 df['OrderDate']=pd.to_datetime(df['OrderDate']).dt.date
-
-chosen_date = st.date_input("Choose the date from 2019-01-01 to 2020-01-01 to show total order quantity by cities.",
+chosen_date = st.date_input("Choose the date from 2019-01-01 to 2020-01-01 to show total sales by cities.",
                             datetime.date(2019,1,1),format="YYYY-MM-DD")
-
 total=df[df['OrderDate']==chosen_date].groupby('City')['Total'].sum()
-sb.barplot(x=total.index,y=total.values)
-sb.set_theme(context='notebook', style='darkgrid', palette='deep', font='sans-serif', font_scale=1, color_codes=True, rc=None)
-plt.xticks(rotation=90)
-plt.xlabel("Cities")
-plt.ylabel("Total qty")
-st.pyplot(plt.gcf())
+
+
+
+d_col,e_col=st.columns(2)
+
+sales_by_city=df_select.groupby('City')['Total'].sum().sort_values(ascending=True)
+dfmonth_fig=px.line(
+    df_select,
+    x=sales_by_city.index,
+    y=sales_by_city.values,
+    title="Total sales by city"
+)
+d_col.plotly_chart(dfmonth_fig,user_container_wide=True)
+
+orderqtybycity_inchosendate=px.bar(
+    total,
+    x=total.index,
+    y=total.values,
+    orientation='v',
+    title="Total sales in all cities by chosen date"
+)
+e_col.plotly_chart(orderqtybycity_inchosendate,user_container_wide=True)
 
 st.title("2019 Sales Dataset")
 st.write(df)
