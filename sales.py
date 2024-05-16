@@ -97,5 +97,3 @@ orderqtybycity_inchosendate=px.bar(
 )
 e_col.plotly_chart(orderqtybycity_inchosendate,user_container_wide=True)
 
-st.title("2019 Sales Dataset")
-st.write(df)
